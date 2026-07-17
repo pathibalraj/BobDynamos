@@ -1,1 +1,1 @@
-CREATE table BOB_TEST.BOB_SF.test(id number,name varchar);
+CREATE table BOB_TEST.BOB_SF.test(id number,name varchar,email varchar);

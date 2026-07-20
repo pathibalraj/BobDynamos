@@ -12,7 +12,6 @@ jobs:
   deploy:
     name: Execute test.sql on Snowflake
     runs-on: ubuntu-latest
-    environment: BOBDYNAMOS_TEST
 
     steps:
       - name: Checkout repository

@@ -1,1 +1,1 @@
-CREATE table BOB_TEST.BOB_SF.test(id number,name varchar,email varchar,Name_1 varchar,Name_2 varchar, address varchar,test varchar);
+CREATE OR REPLACE TABLE BOB_TEST.BOB_SF.test(id number,name varchar,email varchar,Name_1 varchar,Name_2 varchar, address varchar,test varchar);

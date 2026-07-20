@@ -26,6 +26,22 @@ jobs:
       - name: Install Snowflake connector
         run: pip install snowflake-connector-python==3.12.3
 
+      - name: Verify secrets are set
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+        run: |
+          echo "SNOWFLAKE_ACCOUNT is set: $([[ -n "$SNOWFLAKE_ACCOUNT" ]] && echo YES || echo NO)"
+          echo "SNOWFLAKE_USER is set: $([[ -n "$SNOWFLAKE_USER" ]] && echo YES || echo NO)"
+          echo "SNOWFLAKE_PASSWORD is set: $([[ -n "$SNOWFLAKE_PASSWORD" ]] && echo YES || echo NO)"
+          echo "SNOWFLAKE_WAREHOUSE is set: $([[ -n "$SNOWFLAKE_WAREHOUSE" ]] && echo YES || echo NO)"
+          echo "SNOWFLAKE_DATABASE is set: $([[ -n "$SNOWFLAKE_DATABASE" ]] && echo YES || echo NO)"
+          echo "SNOWFLAKE_SCHEMA is set: $([[ -n "$SNOWFLAKE_SCHEMA" ]] && echo YES || echo NO)"
+
       - name: Deploy test.sql to Snowflake
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}

@@ -10,22 +10,34 @@ on:
 
 jobs:
   deploy:
-    name: Execute all SQL files on Snowflake
+    name: Execute changed SQL files on Snowflake
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed SQL files
+        id: changed
+        run: |
+          FILES=$(git diff --name-only HEAD~1 HEAD -- '*.sql' | tr '\n' ' ')
+          echo "files=$FILES" >> $GITHUB_OUTPUT
+          echo "Changed SQL files: $FILES"
 
       - name: Set up Python
+        if: steps.changed.outputs.files != ''
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install Snowflake connector
+        if: steps.changed.outputs.files != ''
         run: pip install snowflake-connector-python==3.12.3
 
-      - name: Deploy all SQL files to Snowflake
+      - name: Deploy changed SQL files to Snowflake
+        if: steps.changed.outputs.files != ''
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
@@ -33,4 +45,9 @@ jobs:
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
           SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
           SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+          CHANGED_FILES: ${{ steps.changed.outputs.files }}
         run: python deploy_snowflake.py
+
+      - name: No SQL changes detected
+        if: steps.changed.outputs.files == ''
+        run: echo "No SQL files were modified in this push. Skipping deployment."

@@ -1,7 +1,8 @@
 """
 deploy_snowflake.py
-Discovers and executes all *.sql files in the repository against Snowflake.
-Files are executed in alphabetical order.
+Executes only the SQL files changed in the current push against Snowflake.
+The list of changed files is passed via the CHANGED_FILES environment variable
+(space-separated), set by the GitHub Actions workflow.
 
 Required environment variables:
   SNOWFLAKE_ACCOUNT    e.g. account-identifier
@@ -10,10 +11,10 @@ Required environment variables:
   SNOWFLAKE_WAREHOUSE  e.g. COMPUTE_WH
   SNOWFLAKE_DATABASE   e.g. MY_DATABASE
   SNOWFLAKE_SCHEMA     e.g. MY_SCHEMA
+  CHANGED_FILES        space-separated list of changed *.sql file paths
 """
 
 import os
-import glob
 import logging
 import snowflake.connector
 
@@ -39,14 +40,15 @@ def main() -> None:
     database  = get_required_env("SNOWFLAKE_DATABASE")
     schema    = get_required_env("SNOWFLAKE_SCHEMA")
 
-    # Discover all *.sql files recursively, sorted alphabetically
-    sql_files = sorted(glob.glob("**/*.sql", recursive=True))
+    # Read only the changed SQL files passed from the workflow
+    changed_files_env = os.environ.get("CHANGED_FILES", "").strip()
+    sql_files = sorted([f for f in changed_files_env.split() if f.endswith(".sql") and os.path.isfile(f)])
 
     if not sql_files:
-        logger.info("No SQL files found. Nothing to deploy.")
+        logger.info("No changed SQL files to deploy. Exiting.")
         return
 
-    logger.info("Found %d SQL file(s) to execute: %s", len(sql_files), sql_files)
+    logger.info("Deploying %d changed SQL file(s): %s", len(sql_files), sql_files)
 
     logger.info("Connecting to Snowflake account: %s", account)
     conn = snowflake.connector.connect(

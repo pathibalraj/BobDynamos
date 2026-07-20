@@ -5,12 +5,12 @@ on:
     branches:
       - main
     paths:
-      - "test.sql"
+      - "**.sql"
   workflow_dispatch:
 
 jobs:
   deploy:
-    name: Execute test.sql on Snowflake
+    name: Execute all SQL files on Snowflake
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
       - name: Install Snowflake connector
         run: pip install snowflake-connector-python==3.12.3
 
-      - name: Deploy test.sql to Snowflake
+      - name: Deploy all SQL files to Snowflake
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}

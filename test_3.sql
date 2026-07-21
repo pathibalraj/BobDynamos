@@ -1,0 +1,1 @@
+CREATE OR REPLACE TABLE BOB_TEST.BOB_SF.test_3(id number,name varchar(150),email varchar,Name_1 varchar,Name_2 varchar, address varchar,test varchar,test1 varchar,test2 varchar);
